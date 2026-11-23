@@ -9,14 +9,14 @@ module Seven_segment(
     output logic dp
 );
 
-    logic [7:0] anode_register;
+    logic [7:0] anode_register;        
     logic [7:0] segment_register;
     
     
-    
+    // no hardware scan: software selects the digit, then writes segments
     always_ff @(posedge clk or negedge rst_n) begin
         if(!rst_n) begin
-            anode_register   <= 8'hff;
+            anode_register   <= 8'hff;    // all off (active-low)
             segment_register <= 8'hff;
         end
         else begin
@@ -32,7 +32,7 @@ module Seven_segment(
     
     assign anode    = anode_register;
     assign data_out = segment_register[6:0];
-    assign dp       = segment_register[7];
+    assign dp       = segment_register[7];    // bit 7 = dp, bits 6:0 = g..a
 
 
 
