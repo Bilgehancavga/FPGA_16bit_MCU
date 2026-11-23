@@ -12,7 +12,7 @@ in assembly and loaded into the chip over UART without re-synthesizing the desig
 
 https://github.com/user-attachments/assets/81bdcf96-81e2-488b-842b-96230e4d467a
 
-
+The demo runs `EXAMPLES/counter_leds.asm`: a seconds counter on the 7-segment display (start / stop / reset with buttons) and a running light on the LEDs, all driven by timer and button interrupts.
 
 ## Features
 
