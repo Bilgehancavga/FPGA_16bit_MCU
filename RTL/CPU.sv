@@ -79,7 +79,7 @@ module CPU(
     logic [7:0] sp_value;
    
     
-    //PIPELINE_FLASH
+    //PIPELINE_FLUSH
     logic pipeline_flush;
     
     // -------------------------------------------
@@ -90,7 +90,7 @@ module CPU(
             instruction_register <= 48'd0;
         else begin
             if(pipeline_flush)
-                instruction_register <= 48'd0;
+                instruction_register <= 48'd0;    // opcode 0 = no-op
             else
                 instruction_register <= machine_code;
         end
@@ -184,7 +184,7 @@ module CPU(
      );
         
        
-    // REGSTER_FILE
+    // REGISTER_FILE
     register_file register_file(
         .clk(clk),
         .read_addr1(addr1_register_file),
@@ -230,7 +230,7 @@ module CPU(
         
     );
     
-    
+    // return address from controller (CALL / interrupt), otherwise register value (STORE / PUSH)
     assign data_ram_out = (data_ram != 16'd0) ? data_ram : register_file_read_data1;
     assign port_data_out = register_file_read_data1;
 
