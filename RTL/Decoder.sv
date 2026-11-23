@@ -21,7 +21,7 @@ module Decoder(
             Address           <= 0;
         end 
         else begin
-            if(pipeline_flush) begin
+            if(pipeline_flush) begin     // opcode 0 = no-op, flushed instruction is not executed
                 op_code           <= 0;
                 Rd                <= 0;
                 Rs1               <= 0;
