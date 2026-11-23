@@ -50,6 +50,7 @@ module PWM(
         end
         else begin
             if(pwm_flag) begin
+                // one tick every (prescaler + 1) clocks
                 if(counter == prescaler) begin
                     counter <= 16'd0;
                     sawtooth_flag <= 1'b1;
@@ -74,6 +75,7 @@ module PWM(
         else begin
             if(pwm_flag) begin
                 if(sawtooth_flag) begin
+                  // 8-bit ramp, 256 ticks = one PWM period
                   if(sawtooth == 255)
                     sawtooth <= 0;
                   else
@@ -86,7 +88,8 @@ module PWM(
         end
     
     end
-    
+
+    // high while ramp < duty, duty = 0..255 (low 8 bits)
     assign pin = (pwm_flag && (sawtooth < duty_cycle[7:0])) ? 1'b1 : 1'b0;
 
 endmodule
