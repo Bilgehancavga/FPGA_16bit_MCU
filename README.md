@@ -8,7 +8,11 @@ in assembly and loaded into the chip over UART without re-synthesizing the desig
 
 ## Demo
 
-<!-- Drag and drop the demo video here in the GitHub editor -->
+
+
+https://github.com/user-attachments/assets/81bdcf96-81e2-488b-842b-96230e4d467a
+
+
 
 ## Features
 
