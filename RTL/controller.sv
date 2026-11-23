@@ -234,19 +234,19 @@ module controller(
             end
         
         INSTRUCTION: begin
-            if (CPU_enable && !cpu_en_d) begin      // RUN'a yeni geçildi
+            if (CPU_enable && !cpu_en_d) begin      // Switched to RUN
                 pipeline_flush = 1'b1;
                 PC_next        = 11'd11;
                 next_state     = RESET_WAIT2;
             end
             else if(CPU_enable) begin 
-                if(ir_valid && op_code != 6'b000000) begin
+                if(ir_valid && op_code != 6'b000000) begin    // not on a flush bubble
                     next_state = INTERRUPT;
                 end
                 else begin
                             
                     case(op_code)       
-                        // FLUSH sonrasý için 
+                        // FLUSH sonrasÃ½ iÃ§in 
                         6'b000000: begin
                             PC_next = PC_next + 1;
                         end
@@ -437,7 +437,7 @@ module controller(
                         // MOVI
                         6'b010000: begin
                             
-                            wb_sel       = 2'b11; 
+                            wb_sel       = 2'b11;    // immediate 
                             write_enable = 1'b1;
                             write_addr   = Rd;
                             
@@ -457,7 +457,7 @@ module controller(
                         
                         // STORE
                         6'b010010: begin
-                            read_addr1   = Rs1;
+                            read_addr1   = Rs1;    // data goes to RAM through data_ram_out
                             ram_write_en = 1'b1;
                             ram_addr     = Address;
                             
@@ -531,7 +531,7 @@ module controller(
                             next_state      = WAIT_STATE; 
                         end
                         
-                        // RJMP
+                        // RJMP (assembler converts the offset to an absolute address)
                         6'b011010: begin
                             pipeline_flush = 1'b1;
                             PC_next        = Address;
@@ -634,7 +634,7 @@ module controller(
                             push            = 1'b1;
                             ram_write_en    = 1'b1; 
                             ram_addr        = sp_value;
-                            data_ram        = {5'b00000, PC-11'd2};
+                            data_ram        = {5'b00000, PC-11'd2};    // address of the instruction after CALL
                             PC_next         = Address;
                             next_state      = WAIT_STATE; 
                             
