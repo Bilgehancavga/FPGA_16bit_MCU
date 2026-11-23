@@ -69,18 +69,18 @@ localparam logic [3:0]
                 result          = extended_result[15:0];
                 carry           = extended_result[16];
                 
-                overflow = (~(a[15] ^ b[15])) & (result[15] ^ a[15]);
+                overflow = (~(a[15] ^ b[15])) & (result[15] ^ a[15]);    // signed overflow
             
             end
             
             SUB: begin
                 result = a-b;              
-                carry = (a >= b);
-                overflow = (a[15]^b[15]) & (result[15]^a[15]);
+                carry = (a >= b);                                        // C=1: no borrow
+                overflow = (a[15]^b[15]) & (result[15]^a[15]);           // signed overflow
             
             end
             
-            CMP: begin
+            CMP: begin           // flags only
                 result = a-b;
                 
                 carry = (a >= b);
@@ -92,7 +92,7 @@ localparam logic [3:0]
             NEG: begin
                 result = (~a) + 16'd1;
                 
-                overflow = (a == 16'h8000);
+                overflow = (a == 16'h8000);                             // -32768 can't be negated
             
             end
             
@@ -100,7 +100,7 @@ localparam logic [3:0]
                 result = a << shift_amount;
                 
                 if(shift_amount != 0)
-                   carry = a[16 - shift_amount];
+                   carry = a[16 - shift_amount];                        // shifted-out bit
             
             end
             
@@ -108,7 +108,7 @@ localparam logic [3:0]
                 result = a >> shift_amount;
                 
                 if(shift_amount != 0)
-                    carry = a[shift_amount - 1];
+                    carry = a[shift_amount - 1];                        // shifted-out bit
             
             end
             
