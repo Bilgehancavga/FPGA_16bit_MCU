@@ -5,7 +5,7 @@ module PINS(
     input logic pins_out_enable,
     input logic direction_enable,
     input logic [15:0] write_data,
-    output logic [15:0] read_data, // CPU'ya
+    output logic [15:0] read_data, // to CPU
   
     inout wire [15:0] pins
     
@@ -15,7 +15,7 @@ module PINS(
     logic [15:0] output_reg;
     
     
-    // Direction 
+    // Direction: 1 = output, 0 = input
     always_ff @(posedge clk or negedge rst_n) begin
         if(!rst_n)
             direction_reg <= 16'd0;
@@ -39,7 +39,7 @@ module PINS(
     generate
         for (i = 0; i < 16; i++) begin: GPIO_GEN
 
-            assign pins[i] =direction_reg[i] ? output_reg[i] : 1'bz;
+            assign pins[i] =direction_reg[i] ? output_reg[i] : 1'bz;    // input: high-Z
 
         end
     endgenerate
@@ -51,9 +51,9 @@ module PINS(
         if(pins_in_enable) begin
             for(int j=0; j<16; j++) begin
                 if(!direction_reg[j])
-                    read_data[j] = pins[j];
+                    read_data[j] = pins[j];    	
                 else
-                    read_data[j] = 1'b0;
+                    read_data[j] = 1'b0;    // output pins read as 0
             end
         end 
     end
