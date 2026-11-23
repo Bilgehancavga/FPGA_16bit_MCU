@@ -127,7 +127,7 @@ module MCU_top(
         
     );
     
-    
+    // LOADER
     LOADER LOADER_inst (
         .clk(clk),
                 
@@ -155,7 +155,7 @@ module MCU_top(
         .machine_code(loader_machine_code),
 
         .flash_write_address(flash_write_address),
-        .flash_read_address(PC),
+        .flash_read_address(PC),                    // fetch
         
         .program_data(machine_code)
         
@@ -221,7 +221,7 @@ module MCU_top(
         .interrupt_enable(interrupt_enable),
         .interrupt_disable(interrupt_disable),
     
-        .interrupt_register(port_data_out),
+        .interrupt_register(port_data_out),                    // mask is written with OUT to port 71
         .interrupt_register_enable(interrupt_register_enable),
     
         .timer0(timer0_interrupt),
@@ -248,7 +248,7 @@ module MCU_top(
         .rst_n(power_on_rst_n)
     );
     
-    // Reset Unit 
+    // Reset Unit: any of the four sources resets the system    
     Reset_unit Reset_unit_inst (
         .clk(clk),
         .loader_reset(loader_reset),
