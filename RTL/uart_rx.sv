@@ -1,15 +1,15 @@
-module uart_rx #(parameter clk_freq = 100_000_000, parameter baud_rate = 9600) // system clock frequency(100 MHz), Target communication speed (Baud rate)
+module uart_rx #(parameter clk_freq = 100_000_000, parameter baud_rate = 9600) 
 
     (
     input logic clk,
     input logic rst_n,
-    input logic rx_in_pin,      // Physical RX input pin
-    output logic [7:0] data,    // Received 8-bit parallel data
-    output logic rx_done,       // Pulse signal indicating data reception is complete
-    output logic framing_err    // High if Stop Bit is not Logic 1
+    input logic rx_in_pin,      
+    output logic [7:0] data,    
+    output logic rx_done,       // one-cycle pulse
+    output logic framing_err    // stop bit was 0
     );
     
-// 16x Oversampling: Each bit is divided into 16 ticks for stable sampling
+// 16x oversampling
 localparam counter_max = (clk_freq / baud_rate)/16; 
 
 typedef enum logic[1:0]  {
@@ -25,11 +25,11 @@ states current_state;
 logic ticks;
 logic [$clog2(counter_max)-1:0] counter;
 logic [4:0] counter2; // Tick counter (0 to 15) to track bit center
-logic [7:0] bit_sequence;   // Index for the 8 data bits
-logic [7:0] data_packet;    // Buffer for incoming bits
-logic [3:0] bit_sample;     // Storage for 3 samples to perform majority voting
+logic [7:0] bit_sequence;   
+logic [7:0] data_packet;    
+logic [3:0] bit_sample;     // 3 samples + majority result
 
-// Double Registering to prevent metastability
+// 2-FF synchronizer
 logic rx_in1, rx_in2;
 always_ff @(posedge clk) begin
 
@@ -81,7 +81,7 @@ always @(posedge clk or negedge rst_n) begin
     end
 end
 
-// UART RX Finite State Machine
+
 always_ff @(posedge clk or negedge rst_n) begin
 
     if(!rst_n) begin
@@ -115,7 +115,7 @@ always_ff @(posedge clk or negedge rst_n) begin
             end
 
             DATA: begin
-                // Sampling at the 6th, 7th, and 8th ticks (near the bit center)
+                // sample at ticks 6, 7, 8 (bit center)
                 if (ticks == 1 && counter2 == 6)
                     bit_sample[0] <= rx_in2; 
 
@@ -126,7 +126,7 @@ always_ff @(posedge clk or negedge rst_n) begin
                 else if(ticks == 1 && counter2 == 8)
                     bit_sample[2] <= rx_in2;
 
-               // At the end of the bit period, decide the bit value and store it
+               // end of bit: store majority result
                 if (ticks == 1 && counter2 == 15)  begin
                    data_packet[bit_sequence] <= bit_sample[3]; 
                       
