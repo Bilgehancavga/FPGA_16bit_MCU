@@ -23,8 +23,8 @@ module Interrupt_controller(
     logic [15:0] interrupt_reg;
     logic [9:0] interrupt_pending;
     logic       interrupt_flag;
-    logic       irq_valid_r;      // YENÝ
-    logic [9:0] irq_id_r;         // YENÝ
+    logic       irq_valid_r;     // request sent to the CPU
+    logic [9:0] irq_id_r;        // one-hot id of that request
     
     always_ff @(posedge clk or negedge rst_n) begin
         if(!rst_n)
@@ -36,7 +36,8 @@ module Interrupt_controller(
                 interrupt_flag <= 1'b0;
         end
     end
-    
+
+    // mask register (port 71), bit 0 = timer0 ... bit 9 = btn_d
     always_ff @(posedge clk or negedge rst_n) begin
         if(!rst_n)
             interrupt_reg <= 16'd0;
@@ -51,8 +52,9 @@ module Interrupt_controller(
             irq_valid_r       <= 1'b0;
         end
         else begin
+            
+            // pending bit 9 = highest priority = vector 9
             if(interrupt_flag) begin
-
                 if (timer0 && interrupt_reg[0]) interrupt_pending[9] <= 1'b1; 
                 if (timer1 && interrupt_reg[1]) interrupt_pending[8] <= 1'b1;
                 if (timer2 && interrupt_reg[2]) interrupt_pending[7] <= 1'b1;
@@ -64,7 +66,7 @@ module Interrupt_controller(
                 if (btn_r  && interrupt_reg[8]) interrupt_pending[1] <= 1'b1;
                 if (btn_d  && interrupt_reg[9]) interrupt_pending[0] <= 1'b1;
 
-                if(!irq_active && !irq_valid_r) begin      // DEÐÝÞTÝ
+                if(!irq_active && !irq_valid_r) begin      // no nesting, one request at a time
 
                     if(interrupt_pending[9]) begin
                         irq_id_r <= 10'b1000000000;
@@ -117,11 +119,15 @@ module Interrupt_controller(
                         interrupt_pending[0] <= 1'b0; 
                     end
                 end
+
+                // CPU accepted, clear the request
                 else if(irq_active) begin
                     irq_id_r    <= 10'd0;
                     irq_valid_r <= 1'b0;
                 end
             end 
+
+            // DI: drop pending requests
             else begin
                 interrupt_pending <= 10'd0;  
                 irq_id_r          <= 10'd0;
@@ -130,7 +136,7 @@ module Interrupt_controller(
         end
     end
 
-    // YENÝ: DI sonrasý CPU kesmeyi görmesin
+// hide the request right after DI   
     assign irq_valid = irq_valid_r && interrupt_flag;
     assign irq_id    = irq_id_r;
 
