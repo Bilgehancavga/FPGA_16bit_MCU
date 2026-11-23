@@ -1,4 +1,4 @@
-module debouncer_edgedetector #(parameter int WAIT_TIME = 15_000_000)
+module debouncer_edgedetector #(parameter int WAIT_TIME = 15_000_000)    // 150 ms at 100 MHz
     (
     input  logic clk,
     input  logic rst_n,
@@ -7,8 +7,6 @@ module debouncer_edgedetector #(parameter int WAIT_TIME = 15_000_000)
     input  logic btn_in,
     output logic btn_out
 );
-
-    // localparam int WAIT_TIME = 15_000_000;
 
 
     typedef enum logic [1:0] {
@@ -22,8 +20,8 @@ module debouncer_edgedetector #(parameter int WAIT_TIME = 15_000_000)
     
     logic pulse, btn_sync_0, btn_sync_1;
     logic db_flag;
+    logic [$clog2(WAIT_TIME)-1:0] counter;
     
-    logic [$clog2(WAIT_TIME)-1:0] counter; // 16,777,215
     
     always_ff @(posedge clk or negedge rst_n) begin
         if(!rst_n)
@@ -35,7 +33,8 @@ module debouncer_edgedetector #(parameter int WAIT_TIME = 15_000_000)
                 db_flag <= 1'b0;                
         end
     end
-    
+
+    // 2-FF synchronizer
     always_ff @(posedge clk or negedge rst_n) begin
         if(!rst_n) begin
             btn_sync_0 <= 1'b0;
@@ -64,7 +63,7 @@ module debouncer_edgedetector #(parameter int WAIT_TIME = 15_000_000)
                         else
                             counter <= 0;
                     end 
-                    COUNTING: begin 
+                    COUNTING: begin    // must stay pressed for WAIT_TIME clocks
                         if(btn_sync_1) begin
                             if(counter == WAIT_TIME) begin
                                 current_state <= DEBOUNCED;
@@ -78,7 +77,7 @@ module debouncer_edgedetector #(parameter int WAIT_TIME = 15_000_000)
                             counter       <= 0;
                         end
                     end 
-                    DEBOUNCED: begin 
+                    DEBOUNCED: begin     // one pulse per press, wait for release
                         if(btn_sync_1) 
                             current_state <= DEBOUNCED;  
                         else begin
@@ -102,6 +101,7 @@ module debouncer_edgedetector #(parameter int WAIT_TIME = 15_000_000)
     
     end
 
+    // debouncer off: synchronized raw level
     assign btn_out = db_flag ? pulse : btn_sync_1;
 
 
