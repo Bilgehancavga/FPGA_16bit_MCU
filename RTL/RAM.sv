@@ -7,14 +7,15 @@ module RAM(
     output logic [15:0] read_data
 );
 
-    logic [15:0] memory [255:0];
+    logic [15:0] memory [255:0];    // 0x00-0xBF data, 0xC0-0xFF stack
     
     always_ff @(posedge clk) begin
         if(write_enable) begin
            memory[address] <= write_data;
         end
     end
-    
+
+    // async read: data in the same cycle (LOAD, POP, RET)
     always_comb begin
         if(read_enable) begin
             read_data = memory[address];
