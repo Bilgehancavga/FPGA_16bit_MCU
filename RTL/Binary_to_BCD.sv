@@ -25,7 +25,7 @@ module Binary_to_BCD(
     
     end
     
-    
+    // double dabble
     always_comb begin
         shift = 36'd0;
         
@@ -51,7 +51,7 @@ module Binary_to_BCD(
                 
                 shift = shift << 1;
             end
-            bcd = shift[31:16];
+            bcd = shift[31:16];    // 4 digits, values above 9999 lose the top digit
         end
         else
             bcd = 16'd0;
