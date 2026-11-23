@@ -322,7 +322,7 @@ module GPIO_top(
         ); 
        
         
-        // BINARY_TO_BCD (Converter)
+        // BCD_TO_SEVENSEGMENT (Converter)
          BCD_to_sevensegment BCD_to_sevensegment(
             .clk(clk),
             .rst_n(rst_n),
@@ -336,7 +336,8 @@ module GPIO_top(
             .bcd(write_data),
             .digit(converter_read_data)
          );
-         
+    
+         // BINARY_TO_BCD
          Binary_to_BCD Binary_to_BCD(
             .clk(clk),
             .rst_n(rst_n),
@@ -363,7 +364,7 @@ module GPIO_top(
         );
         
         
-
+        // one debouncer per button (U, L, C, R, D)
         debouncer_edgedetector DB_U (
             .clk(clk),
             .rst_n(rst_n),
@@ -561,7 +562,8 @@ module GPIO_top(
         
             .reset(watchdog_reset)
         );
-        
+    
+        // IN: data from the selected port
         always_comb begin
             read_data = 16'd0;
         
