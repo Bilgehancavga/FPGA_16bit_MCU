@@ -246,7 +246,7 @@ module controller(
                 else begin
                             
                     case(op_code)       
-                        // FLUSH sonrasý için 
+                        // no-op (flush bubble) 
                         6'b000000: begin
                             PC_next = PC_next + 1;
                         end
