@@ -8,7 +8,7 @@ module Flash_memory(
     output logic [47:0] program_data
 );
 
-    logic [47:0] memory [2047:0]; 
+    logic [47:0] memory [2047:0];     // block RAM, filled by the loader (lost at power-off) 
 
     initial begin
         memory[0] = 48'd0;
@@ -22,7 +22,7 @@ module Flash_memory(
             memory[flash_write_address] <= machine_code;
         
          if(flash_read_enable)
-            program_data <= memory[flash_read_address];
+            program_data <= memory[flash_read_address];    // registered read: 1-cycle fetch latency
             
     end
     
