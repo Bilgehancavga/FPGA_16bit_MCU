@@ -55,14 +55,15 @@ module Watchdog(
             ticks <= 0;
             value_enable <= 1'b0;
         end
-        else if(watchdog_clear) begin
+        else if(watchdog_clear) begin    // program clears it periodically 
             ticks <= 0;
             value_enable <= 1'b0;
         end
         else begin
             if(enable_flag) begin
                 value_enable <= 1'b0;
-                if(ticks==prescaler_value) begin
+                // tick every (prescaler + 1) clocks
+                if(ticks==prescaler_value) begin    
                     value_enable <= 1'b1;
                     ticks <= 0;
                 end
@@ -95,6 +96,7 @@ module Watchdog(
         else begin
             watchdog_reset <= 1'b0;
             if(value_enable) begin
+                // timeout: program did not clear in time, reset the system
                 if(counter == max_value) begin
                     watchdog_reset <= 1'b1;
                     counter <= 0;
