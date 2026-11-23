@@ -2,12 +2,12 @@ module Timer(
     input logic clk,
     input logic rst_n,
     input logic timer_clear,
-    input logic timer_enable, //Timer'ý açmak için 
-    input logic timer_disable, // Timer'ý kapatmak için 
-    input logic interrupt_enable,  // Interrupt'ý açmak için 
-    input logic interrupt_disable, // Interrupt'ý kapatmak için 
-    input logic prescaler_enable, // Prescaler'ýn adresi 
-    input logic max_value_enable, // Max_value adresi 
+    input logic timer_enable, 
+    input logic timer_disable,  
+    input logic interrupt_enable,   
+    input logic interrupt_disable,  
+    input logic prescaler_enable, 
+    input logic max_value_enable,  
     input logic  [15:0] write_data, 
     input logic read_enable,
     output logic [15:0] timer_value,
@@ -78,6 +78,7 @@ module Timer(
         else begin
             value_enable <= 1'b0;
             if(timer_flag) begin
+                // value + 1 every prescaler clocks (0 acts as 65536)
                 if(ticks == prescaler-1) begin
                     ticks <= 16'b0;
                     value_enable <= 1'b1;
@@ -101,6 +102,7 @@ module Timer(
         else begin
             interrupt <= 1'b0;
             if(value_enable) begin
+                // wrap at max_value, one-cycle interrupt pulse
                 if(value==max_value-1) begin
                     value <= 16'b0;
                     if(interrupt_flag)
