@@ -54,6 +54,7 @@ module BCD_to_sevensegment(
     
     end
     
+    // active-low (0 = segment on), bit0 = a ... bit6 = g
     function logic [15:0] bcd_to_seg(input logic [3:0] bcd_in);
         begin
             case(bcd_in)
@@ -67,7 +68,7 @@ module BCD_to_sevensegment(
                 4'd7: bcd_to_seg = 16'b0000000001111000; 
                 4'd8: bcd_to_seg = 16'b0000000000000000; 
                 4'd9: bcd_to_seg = 16'b0000000000010000;
-                default: bcd_to_seg = 16'h007F;
+                default: bcd_to_seg = 16'h007F; // not BCD: blank
             endcase
         end
      endfunction
