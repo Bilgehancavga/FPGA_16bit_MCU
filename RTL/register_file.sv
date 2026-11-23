@@ -11,7 +11,7 @@ module register_file(
 );
     
     
-logic [15:0] registers [31:0];
+logic [15:0] registers [31:0];    // no reset: contents undefined after power-up
 
 always_ff @(posedge clk) begin
     
@@ -20,7 +20,7 @@ always_ff @(posedge clk) begin
     
 end
     
-    
+// 2 async read ports, 1 sync write port
 always_comb begin
     read_data1 = registers[read_addr1];
     read_data2 = registers[read_addr2];
